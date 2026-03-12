@@ -116,5 +116,5 @@ class TargetEnvironment(ManipulationEnv):
             print("Object is not close enough in x or y. Distances:", x_dist, y_dist)
             return False  # Not close enough in x or y
 
-        print("Success!")
+        print("Success and Tested!")
         return True
