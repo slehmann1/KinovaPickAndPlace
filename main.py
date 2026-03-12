@@ -203,3 +203,5 @@ def move_ee_along_trajectory(trajectory_points, step_count, gripper_state, env, 
 if __name__ == "__main__":
     env, obs = initialize_environment()
     task_command_chain(env, obs)
+
+
