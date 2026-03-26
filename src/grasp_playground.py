@@ -5,11 +5,8 @@ from src.utils.graspfactory_parser import GraspFactoryParser
 from src.utils.transforms import (
     transform_to_pose,
     world_grasp_from_object,
-    offset_transform_along_local_axis,
     body_pose_to_transform,
-    quat_wxyz_to_xyzw,
 )
-from src.utils.dataset_xml_builder import get_mesh_bounds
 
 
 PREGRASP_OFFSET_M = 0.10
@@ -56,6 +53,13 @@ def load_dataset_grasp(parser, object_idx=0, grasp_idx=0):
     grasp_width = sample.successful_widths[grasp_idx]
 
     return sample, object_T_grasp, grasp_width
+
+
+def scale_grasp_translation(object_T_grasp, object_scale):
+    """Scale only the translational component of an object-frame grasp pose."""
+    scaled_grasp = np.array(object_T_grasp, dtype=float, copy=True)
+    scaled_grasp[:3, 3] *= np.asarray(object_scale, dtype=float)
+    return scaled_grasp
 
 
 def print_grasp_summary(sample, object_T_grasp, world_T_object, world_T_grasp, grasp_width):
@@ -112,31 +116,23 @@ def visualize_grasp_sequence(env, obs, world_T_grasp):
         obs=obs,
     )
 
-    world_T_pregrasp = offset_transform_along_local_axis(
-        world_T_grasp,
-        axis_index=2,
-        distance=PREGRASP_OFFSET_M,
-        sign=-1.0,
-    )
-
-    pregrasp_pos, pregrasp_quat = transform_to_pose(world_T_pregrasp)
-    grasp_pos, grasp_quat = transform_to_pose(world_T_grasp)
+    grasp_pos, _ = transform_to_pose(world_T_grasp)
+    pregrasp_pos = grasp_pos.copy()
+    pregrasp_pos[2] += PREGRASP_OFFSET_M
 
     print("Moving to pre-grasp pose...")
-    obs = arm_controller.move_ee_to_pose(
+    obs = arm_controller.move_ee_to_position(
         step_count=150,
         goal_pos=pregrasp_pos,
-        goal_quat=quat_wxyz_to_xyzw(pregrasp_quat),
         gripper_state=-1,
         env=env,
         obs=obs,
     )
 
     print("Moving to grasp pose...")
-    obs = arm_controller.move_ee_to_pose(
+    obs = arm_controller.move_ee_to_position(
         step_count=150,
         goal_pos=grasp_pos,
-        goal_quat=quat_wxyz_to_xyzw(grasp_quat),
         gripper_state=-1,
         env=env,
         obs=obs,
@@ -154,10 +150,9 @@ def visualize_grasp_sequence(env, obs, world_T_grasp):
     lift_pos[2] += LIFT_DISTANCE_M
 
     print("Lifting...")
-    obs = arm_controller.move_ee_to_pose(
+    obs = arm_controller.move_ee_to_position(
         step_count=120,
         goal_pos=lift_pos,
-        goal_quat=quat_wxyz_to_xyzw(grasp_quat),
         gripper_state=1,
         env=env,
         obs=obs,
@@ -189,14 +184,9 @@ def compute_table_resting_qpos(
     Returns:
         list[float]: Object joint pose `[x, y, z, qw, qx, qy, qz]`.
     """
-    # TODO: Re-check this clearance against more irregular meshes and non-identity rotations.
-    min_corner, _ = get_mesh_bounds(mesh_path)
-
-    scale = np.asarray(object_scale, dtype=float)
-    scaled_min_corner = min_corner * scale
-
     table_top_z = table_height + table_thickness / 2.0
-    object_origin_z = table_top_z - scaled_min_corner[2] + clearance
+    # DatasetMeshObject XML already rebases the mesh so its bottom sits at local z = 0.
+    object_origin_z = table_top_z + clearance
 
     return [
         object_xy[0],
@@ -223,8 +213,6 @@ def main():
     )
 
     object_scale = (0.001, 0.001, 0.001)
-    # Keep the mesh in a raised debug pose until the table-resting alignment is verified.
-    # TODO: Switch back to compute_table_resting_qpos once the mesh placement path is validated.
     object_qpos = [0.2, -0.1, 1.0, 1.0, 0.0, 0.0, 0.0]
 
     env, obs = arm_controller.initialize_environment(
@@ -243,7 +231,8 @@ def main():
     )
 
     world_T_object = get_sim_object_transform(env)
-    object_T_grasp = object_T_grasp_raw @ GRASP_FRAME_CORRECTION
+    object_T_grasp = scale_grasp_translation(object_T_grasp_raw, object_scale)
+    object_T_grasp = object_T_grasp @ GRASP_FRAME_CORRECTION
     world_T_grasp = world_grasp_from_object(world_T_object, object_T_grasp)
 
     print_grasp_summary(
@@ -254,16 +243,17 @@ def main():
         grasp_width=grasp_width,
     )
 
-    # TODO: Re-enable the grasp motion sequence after the placement debug path is finished.
-    # obs = visualize_grasp_sequence(env, obs, world_T_grasp)
+    obs = visualize_grasp_sequence(env, obs, world_T_grasp)
 
     # TODO: testing
-    print("Object loaded. Holding still for inspection...")
+    print("Object loaded. Holding still for inspection. Press Ctrl+C to exit.")
     try:
-        for _ in range(300):
+        while True:
             action = np.zeros(7)
             obs, _, _, _ = env.step(action)
             env.render()
+    except KeyboardInterrupt:
+        print("Visualization interrupted by user.")
     finally:
         env.close()
 

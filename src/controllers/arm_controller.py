@@ -4,9 +4,11 @@ from scipy.interpolate import CubicSpline
 
 from src.environments import TargetEnvironment
 
-K_P = 10
+K_P = 4
 K_I = 0
 K_D = 0
+MAX_POS_ACTION = 0.2
+MAX_ROT_ACTION = 0.2
 
 
 def _step_and_render(env, action):
@@ -99,8 +101,10 @@ def move_ee_to_position(step_count, goal_pos, gripper_state, env, obs):
         derivative_error = position_error - prev_error
         prev_error = position_error
 
-        action[:3] = (
-            K_P * position_error + K_I * integral_error + K_D * derivative_error
+        action[:3] = np.clip(
+            K_P * position_error + K_I * integral_error + K_D * derivative_error,
+            -MAX_POS_ACTION,
+            MAX_POS_ACTION,
         )
         action[-1] = gripper_state  # Gripper state: -1 for open, 1 for closed
 
@@ -134,8 +138,10 @@ def rotate_ee_to_orientation(step_count, goal_quat, gripper_state, env, obs):
         prev_error = angular_error
 
         action = np.zeros(7)
-        action[3:6] = (
-            K_P * angular_error + K_I * integral_error + K_D * derivative_error
+        action[3:6] = np.clip(
+            K_P * angular_error + K_I * integral_error + K_D * derivative_error,
+            -MAX_ROT_ACTION,
+            MAX_ROT_ACTION,
         )
         action[-1] = gripper_state  # Open
         obs = _step_and_render(env, action)
@@ -176,8 +182,16 @@ def move_ee_to_pose(step_count, goal_pos, goal_quat, gripper_state, env, obs):
         prev_rot = rot_error
 
         action = np.zeros(7)
-        action[:3] = K_P * pos_error + K_I * integral_pos + K_D * derivative_pos
-        action[3:6] = K_P * rot_error + K_I * integral_rot + K_D * derivative_rot
+        action[:3] = np.clip(
+            K_P * pos_error + K_I * integral_pos + K_D * derivative_pos,
+            -MAX_POS_ACTION,
+            MAX_POS_ACTION,
+        )
+        action[3:6] = np.clip(
+            K_P * rot_error + K_I * integral_rot + K_D * derivative_rot,
+            -MAX_ROT_ACTION,
+            MAX_ROT_ACTION,
+        )
         action[-1] = gripper_state
 
         obs = _step_and_render(env, action)
