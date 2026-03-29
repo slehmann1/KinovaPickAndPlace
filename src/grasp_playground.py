@@ -9,11 +9,13 @@ from src.utils.transforms import (
     body_pose_to_transform,
     quat_wxyz_to_xyzw,
 )
-from src.utils.dataset_xml_builder import get_mesh_bounds
+from src.utils.dataset_xml_builder import convert_mesh_frame_translation_to_body_frame
 
 
 PREGRASP_OFFSET_M = 0.10
 LIFT_DISTANCE_M = 0.10
+DEFAULT_OBJECT_XY = (-0.2, 0.0)
+OBJECT_COLLISION_MODE = "convex_hull"
 
 # If the gripper appears rotated wrong relative to the dataset grasp,
 # tune this correction transform. Start with identity.
@@ -58,6 +60,42 @@ def load_dataset_grasp(parser, object_idx=0, grasp_idx=0):
     return sample, object_T_grasp, grasp_width
 
 
+def convert_dataset_grasp_to_body_frame(
+    object_T_grasp_raw,
+    mesh_path,
+    object_scale=(1.0, 1.0, 1.0),
+):
+    """Convert a raw dataset grasp into the MuJoCo object body frame.
+
+    GraspFactory grasps are stored in the source mesh frame. The generated MuJoCo
+    object instead uses a bottom-centered body frame and applies a scale to the
+    source mesh. We must apply that same translation conversion here before we
+    can compose the grasp with the simulated object's world pose.
+
+    Args:
+        object_T_grasp_raw (np.ndarray): Raw dataset grasp in the source mesh frame.
+        mesh_path (str | Path): Source mesh path used for the object.
+        object_scale (tuple[float, float, float]): Per-axis mesh scale used in MuJoCo.
+
+    Returns:
+        np.ndarray: Grasp pose expressed in the generated MuJoCo object body frame.
+    """
+    object_T_grasp_raw = np.asarray(object_T_grasp_raw, dtype=float)
+    if object_T_grasp_raw.shape != (4, 4):
+        raise ValueError(
+            "object_T_grasp_raw must have shape (4, 4), "
+            f"got {object_T_grasp_raw.shape}"
+        )
+
+    object_T_grasp_body = object_T_grasp_raw.copy()
+    object_T_grasp_body[:3, 3] = convert_mesh_frame_translation_to_body_frame(
+        translation=object_T_grasp_raw[:3, 3],
+        mesh_path=mesh_path,
+        scale=object_scale,
+    )
+    return object_T_grasp_body
+
+
 def print_grasp_summary(sample, object_T_grasp, world_T_object, world_T_grasp, grasp_width):
     """Print debug information for a selected grasp candidate.
 
@@ -66,7 +104,7 @@ def print_grasp_summary(sample, object_T_grasp, world_T_object, world_T_grasp, g
         object_T_grasp (np.ndarray): Grasp pose expressed in the object frame.
         world_T_object (np.ndarray): Object pose expressed in the world frame.
         world_T_grasp (np.ndarray): Grasp pose expressed in the world frame.
-        grasp_width (float): Finger width stored with the selected grasp.
+        grasp_width (float): Finger width for the selected grasp in MuJoCo units.
     """
     grasp_pos_obj, grasp_quat_obj = transform_to_pose(object_T_grasp)
     grasp_pos_world, grasp_quat_world = transform_to_pose(world_T_grasp)
@@ -77,7 +115,7 @@ def print_grasp_summary(sample, object_T_grasp, world_T_object, world_T_grasp, g
     print(f"Object ID: {sample.object_id}")
     print(f"Mesh path: {sample.mesh_path}")
     print(f"Successful grasps available: {len(sample.successful_grasps)}")
-    print(f"Selected grasp width: {grasp_width}")
+    print(f"Selected grasp width [m]: {grasp_width}")
     print()
     print("Object-frame grasp pose:")
     print("  position:", grasp_pos_obj)
@@ -166,49 +204,6 @@ def visualize_grasp_sequence(env, obs, world_T_grasp):
     return obs
 
 
-def compute_table_resting_qpos(
-    mesh_path,
-    object_xy=(-0.2, 0.0),
-    object_quat=(1, 0, 0, 0),
-    object_scale=(1.0, 1.0, 1.0),
-    table_height=0.8,
-    table_thickness=0.05,
-    clearance=0.001,
-):
-    """Compute a MuJoCo joint pose that places a mesh just above the table.
-
-    Args:
-        mesh_path (str | Path): Mesh file used to compute local bounds.
-        object_xy (tuple[float, float]): Desired object x-y position on the table.
-        object_quat (tuple[float, float, float, float]): MuJoCo quaternion `[w, x, y, z]`.
-        object_scale (tuple[float, float, float]): Per-axis mesh scale.
-        table_height (float): Table body offset in world coordinates.
-        table_thickness (float): Table thickness used by the arena definition.
-        clearance (float): Small positive gap to avoid initial interpenetration.
-
-    Returns:
-        list[float]: Object joint pose `[x, y, z, qw, qx, qy, qz]`.
-    """
-    # TODO: Re-check this clearance against more irregular meshes and non-identity rotations.
-    min_corner, _ = get_mesh_bounds(mesh_path)
-
-    scale = np.asarray(object_scale, dtype=float)
-    scaled_min_corner = min_corner * scale
-
-    table_top_z = table_height + table_thickness / 2.0
-    object_origin_z = table_top_z - scaled_min_corner[2] + clearance
-
-    return [
-        object_xy[0],
-        object_xy[1],
-        object_origin_z,
-        object_quat[0],
-        object_quat[1],
-        object_quat[2],
-        object_quat[3],
-    ]
-
-
 def main():
     """Load a dataset object, derive a grasp pose, and hold the scene for inspection."""
     parser = GraspFactoryParser(gripper="robotiq_2f85")
@@ -223,14 +218,13 @@ def main():
     )
 
     object_scale = (0.001, 0.001, 0.001)
-    # Keep the mesh in a raised debug pose until the table-resting alignment is verified.
-    # TODO: Switch back to compute_table_resting_qpos once the mesh placement path is validated.
-    object_qpos = [0.2, -0.1, 1.0, 1.0, 0.0, 0.0, 0.0]
+    grasp_width_m = float(grasp_width) * float(object_scale[0])
 
     env, obs = arm_controller.initialize_environment(
         dataset_mesh_path=str(sample.mesh_path),
-        object_qpos=object_qpos,
         object_scale=object_scale,
+        object_xy=DEFAULT_OBJECT_XY,
+        object_collision_approximation=OBJECT_COLLISION_MODE,
     )
 
     print("Moving arm to raised start pose...")
@@ -243,7 +237,12 @@ def main():
     )
 
     world_T_object = get_sim_object_transform(env)
-    object_T_grasp = object_T_grasp_raw @ GRASP_FRAME_CORRECTION
+    object_T_grasp = convert_dataset_grasp_to_body_frame(
+        object_T_grasp_raw=object_T_grasp_raw,
+        mesh_path=sample.mesh_path,
+        object_scale=object_scale,
+    )
+    object_T_grasp = object_T_grasp @ GRASP_FRAME_CORRECTION
     world_T_grasp = world_grasp_from_object(world_T_object, object_T_grasp)
 
     print_grasp_summary(
@@ -251,7 +250,7 @@ def main():
         object_T_grasp=object_T_grasp,
         world_T_object=world_T_object,
         world_T_grasp=world_T_grasp,
-        grasp_width=grasp_width,
+        grasp_width=grasp_width_m,
     )
 
     # TODO: Re-enable the grasp motion sequence after the placement debug path is finished.

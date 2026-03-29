@@ -15,23 +15,44 @@ TEST_QUATS = [
     ("rot_y_180", [0, 0, 1, 0]),
     ("rot_z_180", [0, 0, 0, 1]),
 ]
+DEFAULT_COLLISION_MODE = "mesh"
+DEFAULT_OBJECT_SCALE = (0.01, 0.01, 0.01)
 
 
-def load_generated_geom_pos(mesh_path):
-    """Read the local mesh offset written to the generated MJCF file.
+def _format_scale_tag(scale):
+    """Match the generated asset directory naming used by DatasetMeshObject."""
+    scale = tuple(float(v) for v in scale)
+    return "scale_" + "_".join(f"{v:.6f}".replace(".", "p").replace("-", "m") for v in scale)
+
+
+def load_generated_geom_pos(
+    mesh_path,
+    collision_mode=DEFAULT_COLLISION_MODE,
+    object_scale=DEFAULT_OBJECT_SCALE,
+):
+    """Read the local visual-mesh offset written to the generated MJCF file.
 
     Args:
         mesh_path (Path): Source mesh path.
+        collision_mode (str): Collision mode used to build the generated MJCF.
+        object_scale (tuple[float, float, float]): Mesh scale used for generation.
 
     Returns:
         tuple[Path, np.ndarray]: Generated XML path and local geom position.
     """
-    xml_path = mesh_path.parent / "_generated_mjcf" / f"{mesh_path.stem}.xml"
+    scale_tag = _format_scale_tag(object_scale)
+    xml_path = (
+        mesh_path.parent
+        / "_generated_mjcf"
+        / collision_mode
+        / scale_tag
+        / f"{mesh_path.stem}.xml"
+    )
     root = ET.parse(xml_path).getroot()
 
-    geom_elem = root.find(".//geom[@type='mesh']")
+    geom_elem = root.find(".//geom[@name='object_visual']")
     if geom_elem is None:
-        raise ValueError(f"No mesh geom found in generated XML: {xml_path}")
+        raise ValueError(f"No visual mesh geom found in generated XML: {xml_path}")
 
     geom_pos_text = geom_elem.attrib.get("pos")
     if geom_pos_text is None:
@@ -63,7 +84,13 @@ def get_object_geom_ids(env):
     return geom_ids
 
 
-def print_pose_debug(env, mesh_path, object_qpos, object_scale):
+def print_pose_debug(
+    env,
+    mesh_path,
+    object_qpos,
+    object_scale,
+    collision_mode=DEFAULT_COLLISION_MODE,
+):
     """Print mesh alignment diagnostics for the currently loaded object.
 
     Args:
@@ -75,7 +102,11 @@ def print_pose_debug(env, mesh_path, object_qpos, object_scale):
     body_pos = env.sim.data.body_xpos[env.object_body_id].copy()
     body_rot = env.sim.data.body_xmat[env.object_body_id].reshape(3, 3).copy()
 
-    xml_path, local_geom_pos = load_generated_geom_pos(Path(mesh_path))
+    xml_path, local_geom_pos = load_generated_geom_pos(
+        Path(mesh_path),
+        collision_mode=collision_mode,
+        object_scale=object_scale,
+    )
     expected_geom_world = body_pos + body_rot @ local_geom_pos
 
     min_corner, max_corner = get_mesh_bounds(mesh_path)
@@ -105,9 +136,10 @@ def print_pose_debug(env, mesh_path, object_qpos, object_scale):
     else:
         for geom_id, geom_name in geom_ids:
             actual_geom_world = env.sim.data.geom_xpos[geom_id].copy()
-            error = actual_geom_world - expected_geom_world
             print(f"geom {geom_id} ({geom_name}) world pos:", actual_geom_world)
-            print(f"geom {geom_id} ({geom_name}) expected error:", error)
+            if "visual" in geom_name:
+                error = actual_geom_world - expected_geom_world
+                print(f"geom {geom_id} ({geom_name}) expected error:", error)
     print("=" * 80)
 
 
@@ -139,12 +171,13 @@ def main():
     for name, quat in TEST_QUATS:
         print(f"\nShowing orientation: {name}  quat[w, x, y, z]={quat}")
         object_qpos = [0.0, 0.0, 1.2, *quat]
-        object_scale = (0.01, 0.01, 0.01)
+        object_scale = DEFAULT_OBJECT_SCALE
 
         env, obs = arm_controller.initialize_environment(
             dataset_mesh_path=str(sample.mesh_path),
             object_qpos=object_qpos,
             object_scale=object_scale,
+            object_collision_approximation=DEFAULT_COLLISION_MODE,
         )
 
         print_pose_debug(
@@ -152,6 +185,7 @@ def main():
             mesh_path=sample.mesh_path,
             object_qpos=object_qpos,
             object_scale=object_scale,
+            collision_mode=DEFAULT_COLLISION_MODE,
         )
 
         hold_scene(env, obs, steps=250)

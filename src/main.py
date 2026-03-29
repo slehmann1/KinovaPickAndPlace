@@ -14,8 +14,9 @@ def task_command_chain(env, obs):
     start_position = [0.1, 0.1, 1.5]
     obs = arm_controller.move_ee_to_position(100, start_position, -1, env, obs)
 
-    # Rotate end effector to desired orientation for grasping
-    # TODO: This is currently a hardcoded orientation that works for the cylinder object. We need to compute this based on the shape and pose of the object in the future.
+    # Rotate end effector to desired orientation for grasping.
+    # TODO: This is currently a hardcoded orientation that works for the primitive
+    # demo object. We need to compute this based on the object pose in the future.
     print("Rotating end effector to desired orientation for grasping")
     ee_grab_orientation = [
         0.5,
@@ -37,7 +38,8 @@ def task_command_chain(env, obs):
     obs = arm_controller.set_gripper(50, 1, env, obs)
 
     # Move gripper along a trajectory defined by splines through custom points.
-    # TODO: This is currently a hardcoded trajectory that works for the cylinder object. We need to compute this based on obstacles in the future.
+    # TODO: This is currently a hardcoded trajectory that works for the primitive
+    # demo object. We need to compute this based on obstacles in the future.
     print("Gripper closed. Moving along trajectory")
     trajectory_points = np.array(
         [

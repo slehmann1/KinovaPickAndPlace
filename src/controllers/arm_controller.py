@@ -28,6 +28,9 @@ def initialize_environment(
     dataset_mesh_path=None,
     object_qpos=None,
     object_scale=(1.0, 1.0, 1.0),
+    object_xy=(-0.2, 0.0),
+    object_collision_approximation="mesh",
+    object_drop_height=0.05,
 ):
     """Create and reset the demo environment.
 
@@ -35,6 +38,10 @@ def initialize_environment(
         dataset_mesh_path (str | None): Optional dataset mesh to load in the scene.
         object_qpos (sequence[float] | None): Optional object pose override.
         object_scale (tuple[float, float, float]): Per-axis mesh scale for dataset objects.
+        object_xy (tuple[float, float]): Default spawn position for the manipulated object.
+        object_collision_approximation (str): Collision geometry type for dataset
+            meshes: `mesh`, `convex_hull`, or `box`.
+        object_drop_height (float): Height above the table used for sampled spawns.
 
     Returns:
         tuple[TargetEnvironment, OrderedDict]: Initialized environment and first observation.
@@ -43,6 +50,9 @@ def initialize_environment(
         dataset_mesh_path=dataset_mesh_path,
         object_scale=object_scale,
         object_qpos=object_qpos,
+        object_xy=object_xy,
+        object_collision_approximation=object_collision_approximation,
+        object_drop_height=object_drop_height,
         robots="Kinova3",
         has_renderer=True,
         has_offscreen_renderer=False,
