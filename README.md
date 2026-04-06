@@ -34,6 +34,8 @@ From the project root:
 ```powershell
 .\.venv\Scripts\python.exe .\src\main.py
 .\.venv\Scripts\python.exe .\src\grasp_playground.py
+.\.venv\Scripts\python.exe .\imitation_grasp.py
+.\.venv\Scripts\python.exe .\evaluate_imitation_grasp.py --num-objects 10
 .\.venv\Scripts\python.exe .\src\mesh_debug.py
 ```
 
@@ -41,6 +43,8 @@ From the project root:
 
 - `src/main.py` is the simplest end-to-end scripted demo.
 - `src/grasp_playground.py` is the current sandbox for loading one dataset grasp and inspecting it in the scene.
+- `src/imitation_grasp.py` trains a grasping policy using imitation learning
+- `src/evaluate_imitation_grasp.py` evaluates imitation grasping policies across multiple objects and logs success rates
 - `src/mesh_debug.py` is useful when the loaded mesh appears offset or rotated incorrectly.
 - Dataset files, simulator logs, and generated local artifacts are ignored by `.gitignore` so the commit surface stays focused on source code and documentation.
 

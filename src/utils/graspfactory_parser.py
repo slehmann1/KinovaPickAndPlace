@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 from pathlib import Path
+
 import numpy as np
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DATA_ROOT = PROJECT_ROOT / "data" / "graspfactory"
+DATA_ROOT = Path("C:/Users/samue/PycharmProjects/GraspFactory/graspfactory/robotiq/robotiq")
 
 
 @dataclass
@@ -31,12 +32,12 @@ class GraspFactoryObj:
 class GraspFactoryParser:
     """Load meshes and grasp annotations from the local GraspFactory dataset copy."""
 
-    def __init__(self, root_dir=None, gripper="robotiq_2f85"):
+    def __init__(self, root_dir=None, gripper="robotiq"):
         """Index the requested GraspFactory gripper subset.
 
         Args:
             root_dir (str | Path | None): Dataset root directory override.
-            gripper (str): Gripper subset to load, such as `robotiq_2f85`.
+            gripper (str): Gripper subset to load, such as ``robotiq``.
         """
         self.root_dir = Path(root_dir) if root_dir is not None else DATA_ROOT
         self.gripper = gripper

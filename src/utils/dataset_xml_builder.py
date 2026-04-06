@@ -1,5 +1,6 @@
-from pathlib import Path
 import os
+from pathlib import Path
+
 import numpy as np
 import trimesh
 
@@ -37,6 +38,7 @@ def build_dataset_object_xml(
     density=300.0,
     friction=(1.0, 0.3, 0.1),
     rgba=(0.8, 0.2, 0.2, 1.0),
+    should_log_info=False,
 ):
     """Build a robosuite-compatible MJCF XML file for a dataset OBJ mesh.
 
@@ -78,11 +80,12 @@ def build_dataset_object_xml(
     extent = max_corner - min_corner
     scale = np.asarray(scale, dtype=float)
 
-    print(f"Building XML for mesh: {mesh_path.name}")
-    print(f"Mesh bounds min: {min_corner}")
-    print(f"Mesh bounds max: {max_corner}")
-    print(f"Mesh extent: {extent}")
-    print(f"Mesh scale: {scale}")
+    if should_log_info:
+        print(f"Building XML for mesh: {mesh_path.name}")
+        print(f"Mesh bounds min: {min_corner}")
+        print(f"Mesh bounds max: {max_corner}")
+        print(f"Mesh extent: {extent}")
+        print(f"Mesh scale: {scale}")
 
     # Raw-mesh bottom-center
     center_xy_bottom = np.array([
@@ -112,10 +115,11 @@ def build_dataset_object_xml(
     rel_mesh_path = os.path.relpath(mesh_path, start=xml_out_path.parent).replace(
         "\\", "/"
     )
-
-    print(f"Computed geom_pos: {geom_pos}")
-    print(f"Scaled extent: {scaled_extent}")
-    print(f"Horizontal radius: {horizontal_radius}")
+    
+    if should_log_info:
+        print(f"Computed geom_pos: {geom_pos}")
+        print(f"Scaled extent: {scaled_extent}")
+        print(f"Horizontal radius: {horizontal_radius}")
 
     xml_text = f"""<mujoco model="{model_name}">
   <asset>
