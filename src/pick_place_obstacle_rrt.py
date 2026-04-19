@@ -6,11 +6,13 @@ import copy
 import numpy as np
 
 from src.controllers import arm_controller
+from src.cli_utils import should_enable_renderer
 from src.obstacle_navigation_rrt import (
     SAFE_Z,
     apply_obstacle_overrides,
     plan_rrt_path,
     xy_path_to_cartesian,
+    yaw_degrees_to_quat,
 )
 
 GRASP_Z_OFFSET = 0.03
@@ -35,12 +37,6 @@ DEFAULT_PICK_PLACE_OBSTACLES = [
 ]
 
 
-def yaw_degrees_to_quat(yaw_degrees: float) -> list[float]:
-    yaw_radians = np.deg2rad(yaw_degrees)
-    half_angle = yaw_radians / 2.0
-    return [float(np.cos(half_angle)), 0.0, 0.0, float(np.sin(half_angle))]
-
-
 def get_object_position(env) -> np.ndarray:
     object_pos, _ = env.get_object_pose()
     return np.asarray(object_pos, dtype=float)
@@ -50,7 +46,11 @@ def get_target_position(env) -> np.ndarray:
     return env.sim.data.body_xpos[env.target_zone_body_id].copy()
 
 
-def point_clear_of_obstacles(point_xy: np.ndarray, obstacle_configs: list[dict], clearance_radius: float) -> bool:
+def point_clear_of_obstacles(
+    point_xy: np.ndarray,
+    obstacle_configs: list[dict],
+    clearance_radius: float,
+) -> bool:
     for obstacle in obstacle_configs:
         obstacle_xy = np.asarray(obstacle["pos"][:2], dtype=float)
         padded_half_extents = np.asarray(obstacle["size"][:2], dtype=float) + clearance_radius
@@ -80,7 +80,9 @@ def choose_safe_place_xy(preferred_xy: np.ndarray, obstacle_configs: list[dict])
                 candidates.append(candidate)
 
     if not candidates:
-        raise RuntimeError("Unable to find an obstacle-free placement point near the target zone.")
+        raise RuntimeError(
+            "Unable to find an obstacle-free placement point near the target zone."
+        )
 
     return min(candidates, key=lambda candidate: np.linalg.norm(candidate - preferred_xy))
 
@@ -90,7 +92,11 @@ def set_target_zone_xy(env, target_xy: np.ndarray):
     env.sim.forward()
 
 
-def plan_cartesian_rrt(start_pos: np.ndarray, goal_pos: np.ndarray, obstacle_configs: list[dict]) -> np.ndarray:
+def plan_cartesian_rrt(
+    start_pos: np.ndarray,
+    goal_pos: np.ndarray,
+    obstacle_configs: list[dict],
+) -> np.ndarray:
     path_xy = plan_rrt_path(
         start_xy=np.asarray(start_pos[:2], dtype=float),
         goal_xy=np.asarray(goal_pos[:2], dtype=float),
@@ -100,7 +106,14 @@ def plan_cartesian_rrt(start_pos: np.ndarray, goal_pos: np.ndarray, obstacle_con
     return xy_path_to_cartesian(path_xy, SAFE_Z)
 
 
-def move_along_rrt(env, obs, start_pos: np.ndarray, goal_pos: np.ndarray, gripper_state: int, obstacle_configs: list[dict]):
+def move_along_rrt(
+    env,
+    obs,
+    start_pos: np.ndarray,
+    goal_pos: np.ndarray,
+    gripper_state: int,
+    obstacle_configs: list[dict],
+):
     trajectory = plan_cartesian_rrt(start_pos, goal_pos, obstacle_configs)
     print("Planned transport waypoints:")
     for waypoint in trajectory:
@@ -141,7 +154,7 @@ def align_for_place(env, obs, target_pos: np.ndarray):
         env=env,
         obs=obs,
     )
-    return obs, preplace_pos, place_pos
+    return obs
 
 
 def evaluate_scene_result(env) -> dict:
@@ -179,7 +192,10 @@ def run_demo_with_obstacles(obstacle_configs: list[dict], has_renderer: bool = T
             [object_pos[0], object_pos[1], object_pos[2] + GRASP_Z_OFFSET],
             dtype=float,
         )
-        retreat_pos = np.array([target_pos[0], target_pos[1], SAFE_Z + POST_PLACE_LIFT], dtype=float)
+        retreat_pos = np.array(
+            [target_pos[0], target_pos[1], SAFE_Z + POST_PLACE_LIFT],
+            dtype=float,
+        )
 
         print("Moving to safe start...")
         obs = arm_controller.move_ee_to_position(
@@ -237,7 +253,7 @@ def run_demo_with_obstacles(obstacle_configs: list[dict], has_renderer: bool = T
         )
 
         target_pos = get_target_position(env)
-        obs, _, _ = align_for_place(env, obs, target_pos)
+        obs = align_for_place(env, obs, target_pos)
 
         print("Opening gripper...")
         obs = arm_controller.set_gripper(
@@ -273,6 +289,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="Disable the MuJoCo viewer and run without rendering.",
     )
     parser.add_argument(
+        "--render",
+        action="store_true",
+        help="Force-enable the MuJoCo viewer. Use this with mjpython on macOS.",
+    )
+    parser.add_argument(
         "--obstacle-pos",
         action="append",
         nargs=3,
@@ -297,9 +318,11 @@ def main():
         obstacle_positions=args.obstacle_pos,
         obstacle_yaws=args.obstacle_yaw,
     )
-    run_demo_with_obstacles(obstacle_configs=obstacle_configs, has_renderer=not args.headless)
+    run_demo_with_obstacles(
+        obstacle_configs=obstacle_configs,
+        has_renderer=should_enable_renderer(args.headless, args.render),
+    )
 
 
 if __name__ == "__main__":
     main()
-

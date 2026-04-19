@@ -8,6 +8,7 @@ from typing import Iterable
 import numpy as np
 
 from src.controllers import arm_controller
+from src.cli_utils import should_enable_renderer
 
 SAFE_Z = 1.05
 START_POS = np.array([0.10, -0.20, SAFE_Z], dtype=float)
@@ -269,6 +270,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="Disable the MuJoCo viewer and run the demo without rendering.",
     )
     parser.add_argument(
+        "--render",
+        action="store_true",
+        help="Force-enable the MuJoCo viewer. Use this with mjpython on macOS.",
+    )
+    parser.add_argument(
         "--obstacle-pos",
         action="append",
         nargs=3,
@@ -293,7 +299,10 @@ def main() -> None:
         obstacle_positions=args.obstacle_pos,
         obstacle_yaws=args.obstacle_yaw,
     )
-    run_demo_with_obstacles(obstacle_configs=obstacle_configs, has_renderer=not args.headless)
+    run_demo_with_obstacles(
+        obstacle_configs=obstacle_configs,
+        has_renderer=should_enable_renderer(args.headless, args.render),
+    )
 
 
 if __name__ == "__main__":

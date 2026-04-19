@@ -8,9 +8,7 @@ from pathlib import Path
 import numpy as np
 
 from src.pick_place_obstacle_rrt import (
-    DEFAULT_PICK_PLACE_OBSTACLES,
     PLANNING_BOUNDS,
-    point_clear_of_obstacles,
     run_demo_with_obstacles,
     yaw_degrees_to_quat,
 )
@@ -56,12 +54,19 @@ def sample_random_obstacles(
         if _within_keep_out(candidate_xy, TARGET_CLEARANCE_POINT, KEEP_OUT_RADIUS):
             continue
 
-        size = copy.deepcopy(OBSTACLE_SIZE_CHOICES[int(rng.integers(0, len(OBSTACLE_SIZE_CHOICES)))])
+        size = copy.deepcopy(
+            OBSTACLE_SIZE_CHOICES[int(rng.integers(0, len(OBSTACLE_SIZE_CHOICES)))]
+        )
         obstacle = {
             "pos": [float(candidate_xy[0]), float(candidate_xy[1]), OBSTACLE_Z],
             "size": size,
             "quat": yaw_degrees_to_quat(float(rng.uniform(0.0, 90.0))),
-            "rgba": [float(rng.uniform(0.1, 0.9)), float(rng.uniform(0.1, 0.9)), float(rng.uniform(0.1, 0.9)), 1.0],
+            "rgba": [
+                float(rng.uniform(0.1, 0.9)),
+                float(rng.uniform(0.1, 0.9)),
+                float(rng.uniform(0.1, 0.9)),
+                1.0,
+            ],
         }
 
         overlaps_existing = False
@@ -122,9 +127,19 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Evaluate classical obstacle-aware pick-and-place across randomized scenes."
     )
-    parser.add_argument("--scenes", type=int, default=10, help="Number of randomized scenes to run.")
+    parser.add_argument(
+        "--scenes",
+        type=int,
+        default=10,
+        help="Number of randomized scenes to run.",
+    )
     parser.add_argument("--seed", type=int, default=7, help="Random seed for obstacle generation.")
-    parser.add_argument("--obstacle-count", type=int, default=2, help="Number of obstacles per scene.")
+    parser.add_argument(
+        "--obstacle-count",
+        type=int,
+        default=2,
+        help="Number of obstacles per scene.",
+    )
     parser.add_argument(
         "--render",
         action="store_true",
