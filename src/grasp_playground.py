@@ -208,7 +208,7 @@ def main():
     """Load a dataset object, derive a grasp pose, and hold the scene for inspection."""
     parser = GraspFactoryParser(gripper="robotiq_2f85")
 
-    object_idx = 0
+    object_idx = 1
     grasp_idx = 0
 
     sample, object_T_grasp_raw, grasp_width = load_dataset_grasp(
