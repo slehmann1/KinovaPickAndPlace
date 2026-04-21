@@ -1,0 +1,201 @@
+{
+  "num_requested": 10,
+  "num_evaluated": 10,
+  "num_attempted": 7,
+  "success_count": 1,
+  "success_rate": 0.14285714285714285,
+  "lift_success_threshold_m": 0.03,
+  "dataset_root": "C:/Users/samue/PycharmProjects/GraspFactory/graspfactory/robotiq/robotiq",
+  "seed": null,
+  "start_idx": 0,
+  "render": false,
+  "visualize_count": 10,
+  "model_path": "",
+  "policy_prototypes": 1000,
+  "policy_demo_count": 262025,
+  "results": [
+    {
+      "object_idx": 23857,
+      "object_id": "00608575_d2d33176caadcc482df68df0_step_000_0032",
+      "demo_count": 262025,
+      "cluster_count": 1000,
+      "selected_prototype": 483,
+      "prototype_score": 0.24385819943875245,
+      "predicted_width": 34.19596862792969,
+      "initial_object_pos": [
+        -0.12,
+        0.0,
+        0.8260000000000001
+      ],
+      "final_object_pos": [
+        -0.11925761248437798,
+        -0.0016270635613948278,
+        0.7977281107580155
+      ],
+      "lift_delta": -0.028271889241984538,
+      "lift_success": false,
+      "model_source": "loaded",
+      "model_path": "",
+      "status": "ok"
+    },
+    {
+      "object_idx": 6326,
+      "object_id": "00158010_1a4ef5a949653728a324ccbc_step_000_0023",
+      "demo_count": 262025,
+      "cluster_count": 1000,
+      "selected_prototype": 483,
+      "prototype_score": 0.24385819943875245,
+      "predicted_width": 34.19596862792969,
+      "initial_object_pos": [
+        -0.12,
+        0.0,
+        0.8260000000000001
+      ],
+      "final_object_pos": [
+        -0.11856578719508859,
+        -0.0018997617154705509,
+        0.7952485535800382
+      ],
+      "lift_delta": -0.03075144641996186,
+      "lift_success": false,
+      "model_source": "loaded",
+      "model_path": "",
+      "status": "ok"
+    },
+    {
+      "object_idx": 15175,
+      "status": "error",
+      "error": "No mesh found for object_id=00391235_15e827fc46a9aca6f0388699_step_019_0000, mesh_uid=00391235_15e827fc46a9aca6f0388699_step_019_0000"
+    },
+    {
+      "object_idx": 9903,
+      "object_id": "00259824_5999a20ecba82fa6af21d0d5_step_000_0010",
+      "demo_count": 262025,
+      "cluster_count": 1000,
+      "selected_prototype": 483,
+      "prototype_score": 0.24385819943875245,
+      "predicted_width": 34.19596862792969,
+      "initial_object_pos": [
+        -0.12,
+        0.0,
+        0.8260000000000001
+      ],
+      "final_object_pos": [
+        -0.12832764234791488,
+        -0.0005342391814469977,
+        0.8482804967421487
+      ],
+      "lift_delta": 0.022280496742148603,
+      "lift_success": false,
+      "model_source": "loaded",
+      "model_path": "",
+      "status": "ok"
+    },
+    {
+      "object_idx": 2814,
+      "object_id": "00032063_65d97959fd934679937711aa_step_000_0044",
+      "demo_count": 262025,
+      "cluster_count": 1000,
+      "selected_prototype": 483,
+      "prototype_score": 0.24385819943875245,
+      "predicted_width": 34.19596862792969,
+      "initial_object_pos": [
+        -0.12,
+        0.0,
+        0.8260000000000001
+      ],
+      "final_object_pos": [
+        0.00031126543643266813,
+        -0.004127042383215468,
+        0.8225315243288318
+      ],
+      "lift_delta": -0.0034684756711682585,
+      "lift_success": false,
+      "model_source": "loaded",
+      "model_path": "",
+      "status": "ok"
+    },
+    {
+      "object_idx": 24208,
+      "status": "error",
+      "error": "No mesh found for object_id=00616277_8c9da2b362ee2dd997c48a19_step_000_0005, mesh_uid=00616277_8c9da2b362ee2dd997c48a19_step_000_0005"
+    },
+    {
+      "object_idx": 27939,
+      "object_id": "00707974_2983c173821d9de7f2db3a37_step_002_0000",
+      "demo_count": 262025,
+      "cluster_count": 1000,
+      "selected_prototype": 483,
+      "prototype_score": 0.24385819943875245,
+      "predicted_width": 34.19596862792969,
+      "initial_object_pos": [
+        -0.12,
+        0.0,
+        0.8260000000000001
+      ],
+      "final_object_pos": [
+        -0.12677219889613478,
+        -0.0004869124324564678,
+        0.8271140001305822
+      ],
+      "lift_delta": 0.00111400013058216,
+      "lift_success": false,
+      "model_source": "loaded",
+      "model_path": "",
+      "status": "ok"
+    },
+    {
+      "object_idx": 21579,
+      "status": "error",
+      "error": "No mesh found for object_id=00547202_c71051f778b1b86775b090b1_step_000_0056, mesh_uid=00547202_c71051f778b1b86775b090b1_step_000_0056"
+    },
+    {
+      "object_idx": 25021,
+      "object_id": "00634422_2647b165da215375f55c669e_step_008_0002",
+      "demo_count": 262025,
+      "cluster_count": 1000,
+      "selected_prototype": 483,
+      "prototype_score": 0.24385819943875245,
+      "predicted_width": 34.19596862792969,
+      "initial_object_pos": [
+        -0.12,
+        0.0,
+        0.8260000000000001
+      ],
+      "final_object_pos": [
+        -0.1199985312526534,
+        -1.0216052561049334e-05,
+        0.7994611055851868
+      ],
+      "lift_delta": -0.026538894414813274,
+      "lift_success": false,
+      "model_source": "loaded",
+      "model_path": "",
+      "status": "ok"
+    },
+    {
+      "object_idx": 31109,
+      "object_id": "00796568_13baa613f0d90145df38f00d_step_000_0000",
+      "demo_count": 262025,
+      "cluster_count": 1000,
+      "selected_prototype": 483,
+      "prototype_score": 0.24385819943875245,
+      "predicted_width": 34.19596862792969,
+      "initial_object_pos": [
+        -0.12,
+        0.0,
+        0.8260000000000001
+      ],
+      "final_object_pos": [
+        -0.12161123284305798,
+        -0.0009494148306232381,
+        0.8738294634579786
+      ],
+      "lift_delta": 0.04782946345797856,
+      "lift_success": true,
+      "model_source": "loaded",
+      "model_path": "",
+      "status": "ok"
+    }
+  ]
+}
