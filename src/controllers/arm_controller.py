@@ -36,10 +36,7 @@ def _record_step(data_log, command_name, action, obs, reward, done, env):
     if data_log is None:
         return
 
-    object_position = None
-    object_orientation = None
-    if hasattr(env, "get_object_pose"):
-        object_position, object_orientation = env.get_object_pose()
+    object_position, object_orientation = env.get_object_pose()
 
     data_log.append(
         {
@@ -69,6 +66,7 @@ def _step_and_render(env, action, data_log=None, command_name="unnamed_command")
     """
     obs, reward, done, _ = env.step(action)
     _record_step(data_log, command_name, action, obs, reward, done, env)
+
     if getattr(env, "has_renderer", False):
         env.render()
     return obs
@@ -327,12 +325,8 @@ def move_ee_along_trajectory(
     prev_error = np.zeros(3)
 
     trajectory_points = np.asarray(trajectory_points, dtype=float)
-    if trajectory_points.ndim != 2 or trajectory_points.shape[1] != 3:
-        raise ValueError(
-            "trajectory_points must have shape (n, 3) for Cartesian waypoints"
-        )
     if len(trajectory_points) < 2:
-        raise ValueError("trajectory_points must contain at least two waypoints")
+        raise ValueError("must contain at least two waypoints")
 
     # Create cubic splines for x, y, z
     t_points = np.arange(len(trajectory_points))

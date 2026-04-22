@@ -1,4 +1,4 @@
-from src.obstacle_navigation_rrt import main
+from src.obstacle.obstacle_navigation_rrt import main
 
 
 if __name__ == "__main__":

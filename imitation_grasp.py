@@ -1,4 +1,5 @@
-from src.imitation_grasp import main
+from src.grasp.imitation_grasp import main
+
 
 if __name__ == "__main__":
     main()

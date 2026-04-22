@@ -8,14 +8,14 @@ from pathlib import Path
 import numpy as np
 
 from src.controllers import arm_controller
-from src.grasp_playground import (GRASP_FRAME_CORRECTION,
-                                  compute_table_resting_qpos,
-                                  get_sim_object_transform,
-                                  print_grasp_summary, scale_grasp_translation,
-                                  visualize_grasp_sequence)
-from src.imitation_grasp import (DATASET_ROOT, DEFAULT_MODEL_DIR,
-                                 DEFAULT_MODEL_NAME, OBJECT_SCALE,
-                                 GraspImitationPolicy, load_dataset_policy)
+from src.grasp.grasp_playground import (GRASP_FRAME_CORRECTION,
+                                        compute_table_resting_qpos,
+                                        get_sim_object_transform,
+                                        print_grasp_summary, scale_grasp_translation,
+                                        visualize_grasp_sequence)
+from src.grasp.imitation_grasp import (DATASET_ROOT, DEFAULT_MODEL_DIR,
+                                       DEFAULT_MODEL_NAME, OBJECT_SCALE,
+                                       GraspImitationPolicy, load_dataset_policy)
 from src.utils.graspfactory_parser import GraspFactoryParser
 from src.utils.transforms import world_grasp_from_object
 

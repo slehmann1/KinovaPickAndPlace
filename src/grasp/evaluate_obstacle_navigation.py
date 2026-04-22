@@ -6,7 +6,7 @@ from pathlib import Path
 
 import numpy as np
 
-from src.pick_place_obstacle_rrt import (
+from src.obstacle.pick_place_obstacle_rrt import (
     planningBounds,
     runDemoWithObstacles,
 )

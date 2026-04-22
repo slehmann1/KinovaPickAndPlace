@@ -10,7 +10,7 @@ from scipy.spatial.transform import Rotation as R
 from src.utils.graspfactory_parser import GraspFactoryParser
 
 OBJECT_SCALE = (0.001, 0.001, 0.001)
-DATASET_ROOT = "C:/Users/samue/PycharmProjects/GraspFactory/graspfactory/robotiq/robotiq"
+DATASET_ROOT = "D:/graspfactory/robotiq"
 DEFAULT_MODEL_DIR = "data/models/imitation_grasp"
 DEFAULT_MODEL_NAME = "Model_B"
 DEFAULT_MAX_GRASPS_PER_OBJECT = 8

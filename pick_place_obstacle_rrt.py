@@ -1,4 +1,4 @@
-from src.pick_place_obstacle_rrt import main
+from src.obstacle.pick_place_obstacle_rrt import main
 
 
 if __name__ == "__main__":

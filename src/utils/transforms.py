@@ -13,10 +13,6 @@ def quat_wxyz_to_xyzw(quaternion_wxyz):
         np.ndarray: [x, y, z, w]
     """
     quaternion_wxyz = np.asarray(quaternion_wxyz, dtype=float)
-    if quaternion_wxyz.shape != (4,):
-        raise ValueError(
-            f"quaternion_wxyz must have shape (4,), got {quaternion_wxyz.shape}"
-        )
     return quaternion_wxyz[[1, 2, 3, 0]]
 
 
@@ -31,10 +27,6 @@ def quat_xyzw_to_wxyz(quaternion_xyzw):
         np.ndarray: [w, x, y, z]
     """
     quaternion_xyzw = np.asarray(quaternion_xyzw, dtype=float)
-    if quaternion_xyzw.shape != (4,):
-        raise ValueError(
-            f"quaternion_xyzw must have shape (4,), got {quaternion_xyzw.shape}"
-        )
     return quaternion_xyzw[[3, 0, 1, 2]]
 
 
@@ -106,8 +98,6 @@ def transform_to_pose(T):
             quaternion [w, x, y, z] shape (4,)
     """
     T = np.asarray(T, dtype=float)
-    if T.shape != (4, 4):
-        raise ValueError(f"T must have shape (4, 4), got {T.shape}")
 
     position = T[:3, 3].copy()
     rotation = T[:3, :3].copy()
@@ -129,11 +119,6 @@ def compose_transforms(A, B):
     A = np.asarray(A, dtype=float)
     B = np.asarray(B, dtype=float)
 
-    if A.shape != (4, 4):
-        raise ValueError(f"A must have shape (4, 4), got {A.shape}")
-    if B.shape != (4, 4):
-        raise ValueError(f"B must have shape (4, 4), got {B.shape}")
-
     return A @ B
 
 
@@ -148,8 +133,6 @@ def invert_transform(T):
         np.ndarray: inverse transform
     """
     T = np.asarray(T, dtype=float)
-    if T.shape != (4, 4):
-        raise ValueError(f"T must have shape (4, 4), got {T.shape}")
 
     R_part = T[:3, :3]
     t_part = T[:3, 3]
@@ -174,10 +157,6 @@ def offset_transform_along_local_axis(T, axis_index=2, distance=0.1, sign=1.0):
         np.ndarray: shifted 4x4 transform
     """
     T = np.asarray(T, dtype=float)
-    if T.shape != (4, 4):
-        raise ValueError(f"T must have shape (4, 4), got {T.shape}")
-    if axis_index not in (0, 1, 2):
-        raise ValueError(f"axis_index must be 0, 1, or 2, got {axis_index}")
 
     T_shifted = T.copy()
     local_axis_world = T[:3, axis_index]

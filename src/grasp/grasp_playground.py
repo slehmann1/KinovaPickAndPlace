@@ -41,14 +41,6 @@ def load_dataset_grasp(parser, object_idx=0, grasp_idx=0):
     """
     sample = parser[object_idx]
 
-    if len(sample.success_indices) == 0:
-        raise ValueError(f"No successful grasps found for object {sample.object_id}")
-
-    if grasp_idx < 0 or grasp_idx >= len(sample.successful_grasps):
-        raise IndexError(
-            f"grasp_idx {grasp_idx} out of range for {len(sample.successful_grasps)} successful grasps"
-        )
-
     object_T_grasp = sample.successful_grasps[grasp_idx]
     grasp_width = sample.successful_widths[grasp_idx]
 
@@ -75,25 +67,19 @@ def print_grasp_summary(sample, object_T_grasp, world_T_object, world_T_grasp, g
     grasp_pos_obj, grasp_quat_obj = transform_to_pose(object_T_grasp)
     grasp_pos_world, grasp_quat_world = transform_to_pose(world_T_grasp)
 
-    print("=" * 80)
-    print("Grasp visualization summary")
-    print("=" * 80)
+    print("Grasp visualization summary:")
     print(f"Object ID: {sample.object_id}")
     print(f"Mesh path: {sample.mesh_path}")
     print(f"Successful grasps available: {len(sample.successful_grasps)}")
     print(f"Selected grasp width: {grasp_width}")
-    print()
     print("Object-frame grasp pose:")
     print("  position:", grasp_pos_obj)
     print("  quaternion [w, x, y, z]:", grasp_quat_obj)
-    print()
     print("World-frame object transform:")
     print(world_T_object)
-    print()
     print("World-frame grasp pose:")
     print("  position:", grasp_pos_world)
     print("  quaternion [w, x, y, z]:", grasp_quat_world)
-    print("=" * 80)
 
 
 def visualize_grasp_sequence(env, obs, world_T_grasp):

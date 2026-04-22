@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 
 from src.controllers import arm_controller
-from src.obstacle_navigation_rrt import (
+from src.obstacle.obstacle_navigation_rrt import (
     planRrtPath,
     safeZ,
     xyPathToCartesian,

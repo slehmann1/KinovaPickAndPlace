@@ -20,7 +20,7 @@ def get_mesh_bounds(mesh_path):
         tuple[np.ndarray, np.ndarray]: Minimum and maximum mesh corners.
     """
     mesh = trimesh.load_mesh(Path(mesh_path), process=False)
-    if mesh.is_empty or len(mesh.vertices) == 0:
+    if len(mesh.vertices) == 0:
         raise ValueError(f"Mesh is empty or invalid: {mesh_path}")
 
     vertices = np.asarray(mesh.vertices)
@@ -45,10 +45,6 @@ def build_dataset_object_xml(
     The mesh geom is repositioned so that x and y are centered while the
     bottom of the mesh sits at local `z = 0`.
 
-    IMPORTANT:
-    The geom offset must be scaled into MuJoCo world units, because mesh scale
-    does not automatically scale geom positions.
-
     Args:
         mesh_path (str | Path): Source OBJ mesh path.
         xml_out_path (str | Path): Destination path for the generated MJCF file.
@@ -67,9 +63,6 @@ def build_dataset_object_xml(
     xml_out_path.parent.mkdir(parents=True, exist_ok=True)
 
     mesh = trimesh.load_mesh(mesh_path, process=False)
-    if mesh.is_empty:
-        raise ValueError(f"Mesh is empty: {mesh_path}")
-
     vertices = np.asarray(mesh.vertices)
     if len(vertices) == 0:
         raise ValueError(f"Mesh has no vertices: {mesh_path}")
