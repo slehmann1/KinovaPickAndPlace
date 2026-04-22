@@ -23,6 +23,7 @@ class TargetEnvironment(ManipulationEnv):
         dataset_mesh_path=None,
         object_scale=(1.0, 1.0, 1.0),
         object_qpos=None,
+        obstacle_configs=None,
         **kwargs,
     ):
         """Initialize the environment configuration before robosuite model loading.
@@ -31,11 +32,13 @@ class TargetEnvironment(ManipulationEnv):
             dataset_mesh_path (str | Path | None): Optional mesh path for a dataset object.
             object_scale (tuple[float, float, float]): Per-axis mesh scale in MuJoCo units.
             object_qpos (sequence[float] | None): Optional initial object joint pose.
+            obstacle_configs (list[dict] | None): Optional fixed box obstacles.
             **kwargs: Additional robosuite environment arguments.
         """
         self.dataset_mesh_path = dataset_mesh_path
         self.object_scale = object_scale
         self.object_qpos = object_qpos
+        self.obstacle_configs = obstacle_configs or []
         super().__init__(**kwargs)
 
     def _load_model(self):
@@ -60,10 +63,12 @@ class TargetEnvironment(ManipulationEnv):
         self.robots[0].robot_model.set_base_xpos([-0.5, 0, 0])
 
         robot_models = [robot.robot_model for robot in self.robots]
+        mujoco_objects = [self.target_zone, self._get_object()]
+        mujoco_objects.extend(self._build_obstacles())
         self.model = ManipulationTask(
             mujoco_arena=self.mujoco_arena,
             mujoco_robots=robot_models,
-            mujoco_objects=[self.target_zone, self._get_object()],
+            mujoco_objects=mujoco_objects,
         )
 
     def _get_object(self):
@@ -88,12 +93,34 @@ class TargetEnvironment(ManipulationEnv):
             obj_type="all",  # "all" creates both a visual mesh and a collision geom
         )
 
+    def _build_obstacles(self):
+        """Create any fixed box obstacles requested for the scene."""
+        obstacles = []
+        for index, config in enumerate(self.obstacle_configs):
+            size = list(config.get("size", [0.04, 0.04, 0.08]))
+            rgba = list(config.get("rgba", [0.2, 0.2, 0.2, 1.0]))
+            obstacles.append(
+                BoxObject(
+                    name=f"obstacle_{index}",
+                    size=size,
+                    rgba=rgba,
+                    joints=None,
+                    obj_type="all",
+                    duplicate_collision_geoms=True,
+                )
+            )
+        return obstacles
+
     def _setup_references(self):
         """Cache MuJoCo IDs used during resets and state queries."""
         super()._setup_references()
         self.target_zone_body_id = self.sim.model.body_name2id("target_zone_main")
         self.object_body_id = self.sim.model.body_name2id("obj_main")
         self.object_joint_name = "obj_joint0"
+        self.obstacle_body_ids = []
+        for index, _ in enumerate(self.obstacle_configs):
+            body_id = self.sim.model.body_name2id(f"obstacle_{index}_main")
+            self.obstacle_body_ids.append(body_id)
 
     def _reset_internal(self):
         """Reset dynamic state and place the target zone and object for a new episode."""
@@ -111,6 +138,13 @@ class TargetEnvironment(ManipulationEnv):
             qpos = np.array(self.object_qpos, dtype=float)
 
         self.sim.data.set_joint_qpos(self.object_joint_name, qpos)
+
+        for body_id, config in zip(self.obstacle_body_ids, self.obstacle_configs):
+            self.sim.model.body_pos[body_id] = np.array(config["pos"], dtype=float)
+            obstacle_quat = config.get("quat")
+            if obstacle_quat is not None:
+                self.sim.model.body_quat[body_id] = np.array(obstacle_quat, dtype=float)
+
         self.sim.forward()
 
     def get_object_pose(self):

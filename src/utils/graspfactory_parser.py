@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 from pathlib import Path
+
 import numpy as np
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DATA_ROOT = PROJECT_ROOT / "data" / "graspfactory"
+# TODO: update to local folder
+DATA_ROOT = Path("D:/graspfactory/robotiq")
 
 
 @dataclass
@@ -29,17 +30,16 @@ class GraspFactoryObj:
 
 
 class GraspFactoryParser:
-    """Load meshes and grasp annotations from the local GraspFactory dataset copy."""
+    """Load meshes and grasp annotations from the local GraspFactory dataset."""
 
-    def __init__(self, root_dir=None, gripper="robotiq_2f85"):
+    def __init__(self, root_dir=None, gripper="robotiq"):
         """Index the requested GraspFactory gripper subset.
 
         Args:
             root_dir (str | Path | None): Dataset root directory override.
-            gripper (str): Gripper subset to load, such as `robotiq_2f85`.
+            gripper (str): Gripper subset to load, such as ``robotiq``.
         """
         self.root_dir = Path(root_dir) if root_dir is not None else DATA_ROOT
-        self.gripper = gripper
 
         self.grasp_dir = self.root_dir / gripper / "grasps"
         self.mesh_dir = self.root_dir / gripper / "meshes"
@@ -76,16 +76,16 @@ class GraspFactoryParser:
             f"No mesh found for object_id={object_id}, mesh_uid={mesh_uid}"
         )
 
-    def __getitem__(self, idx):
+    def __getitem__(self, index):
         """Load a dataset sample by index.
 
         Args:
-            idx (int): Zero-based sample index.
+            index (int): Object item index.
 
         Returns:
             GraspFactoryObj: Loaded dataset sample.
         """
-        grasp_file = self.grasp_files[idx]
+        grasp_file = self.grasp_files[index]
         object_id = grasp_file.stem
 
         data = np.load(grasp_file, allow_pickle=True)
@@ -97,6 +97,7 @@ class GraspFactoryParser:
 
         mesh_path = self._resolve_mesh_path(object_id, mesh_uid)
 
+        # Build Grasp Factory object from mesh
         return GraspFactoryObj(
             object_id=object_id,
             mesh_path=mesh_path,

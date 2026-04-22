@@ -221,3 +221,5 @@ MUJOCO_LOG.TXT
 $null
 data/graspfactory/
 data/graspfactory_repo/
+
+data/acronym_repo/

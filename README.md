@@ -32,16 +32,26 @@ The build script installs local dependencies, clones the upstream GraspFactory r
 From the project root:
 
 ```powershell
-.\.venv\Scripts\python.exe .\src\main.py
-.\.venv\Scripts\python.exe .\src\grasp_playground.py
-.\.venv\Scripts\python.exe .\src\mesh_debug.py
+.\.venv\Scripts\python.exe .\main.py
+.\.venv\Scripts\python.exe .\obstacle_navigation_rrt.py
+.\.venv\Scripts\python.exe .\pick_place_obstacle_rrt.py
+.\.venv\Scripts\python.exe .\evaluate_obstacle_navigation.py
+.\.venv\Scripts\python.exe .\imitation_grasp.py
+.\.venv\Scripts\python.exe .\evaluate_imitation_grasp.py --num-objects 10
+.\.venv\Scripts\python.exe -m src.grasp.grasp_playground
+.\.venv\Scripts\python.exe -m src.utils.mesh_debug
 ```
 
 ## Notes
 
-- `src/main.py` is the simplest end-to-end scripted demo.
-- `src/grasp_playground.py` is the current sandbox for loading one dataset grasp and inspecting it in the scene.
-- `src/mesh_debug.py` is useful when the loaded mesh appears offset or rotated incorrectly.
+- `main.py` is the simplest end-to-end scripted demo.
+- `obstacle_navigation_rrt.py` runs the obstacle-navigation RRT demo.
+- `pick_place_obstacle_rrt.py` runs the obstacle-aware pick-and-place pipeline.
+- `evaluate_obstacle_navigation.py` runs randomized obstacle-scene evaluation and writes a report.
+- `imitation_grasp.py` trains a grasping policy using imitation learning.
+- `evaluate_imitation_grasp.py` evaluates imitation grasping policies across multiple objects and logs success rates.
+- `python -m src.grasp.grasp_playground` is the current sandbox for loading one dataset grasp and inspecting it in the scene.
+- `python -m src.utils.mesh_debug` is useful when the loaded mesh appears offset or rotated incorrectly.
 - Dataset files, simulator logs, and generated local artifacts are ignored by `.gitignore` so the commit surface stays focused on source code and documentation.
 
 ## Current limitations

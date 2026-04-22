@@ -1,5 +1,6 @@
-from pathlib import Path
 import os
+from pathlib import Path
+
 import numpy as np
 import trimesh
 
@@ -19,7 +20,7 @@ def get_mesh_bounds(mesh_path):
         tuple[np.ndarray, np.ndarray]: Minimum and maximum mesh corners.
     """
     mesh = trimesh.load_mesh(Path(mesh_path), process=False)
-    if mesh.is_empty or len(mesh.vertices) == 0:
+    if len(mesh.vertices) == 0:
         raise ValueError(f"Mesh is empty or invalid: {mesh_path}")
 
     vertices = np.asarray(mesh.vertices)
@@ -37,15 +38,12 @@ def build_dataset_object_xml(
     density=300.0,
     friction=(1.0, 0.3, 0.1),
     rgba=(0.8, 0.2, 0.2, 1.0),
+    should_log_info=False,
 ):
     """Build a robosuite-compatible MJCF XML file for a dataset OBJ mesh.
 
     The mesh geom is repositioned so that x and y are centered while the
     bottom of the mesh sits at local `z = 0`.
-
-    IMPORTANT:
-    The geom offset must be scaled into MuJoCo world units, because mesh scale
-    does not automatically scale geom positions.
 
     Args:
         mesh_path (str | Path): Source OBJ mesh path.
@@ -65,9 +63,6 @@ def build_dataset_object_xml(
     xml_out_path.parent.mkdir(parents=True, exist_ok=True)
 
     mesh = trimesh.load_mesh(mesh_path, process=False)
-    if mesh.is_empty:
-        raise ValueError(f"Mesh is empty: {mesh_path}")
-
     vertices = np.asarray(mesh.vertices)
     if len(vertices) == 0:
         raise ValueError(f"Mesh has no vertices: {mesh_path}")
@@ -78,11 +73,12 @@ def build_dataset_object_xml(
     extent = max_corner - min_corner
     scale = np.asarray(scale, dtype=float)
 
-    print(f"Building XML for mesh: {mesh_path.name}")
-    print(f"Mesh bounds min: {min_corner}")
-    print(f"Mesh bounds max: {max_corner}")
-    print(f"Mesh extent: {extent}")
-    print(f"Mesh scale: {scale}")
+    if should_log_info:
+        print(f"Building XML for mesh: {mesh_path.name}")
+        print(f"Mesh bounds min: {min_corner}")
+        print(f"Mesh bounds max: {max_corner}")
+        print(f"Mesh extent: {extent}")
+        print(f"Mesh scale: {scale}")
 
     # Raw-mesh bottom-center
     center_xy_bottom = np.array([
@@ -112,10 +108,11 @@ def build_dataset_object_xml(
     rel_mesh_path = os.path.relpath(mesh_path, start=xml_out_path.parent).replace(
         "\\", "/"
     )
-
-    print(f"Computed geom_pos: {geom_pos}")
-    print(f"Scaled extent: {scaled_extent}")
-    print(f"Horizontal radius: {horizontal_radius}")
+    
+    if should_log_info:
+        print(f"Computed geom_pos: {geom_pos}")
+        print(f"Scaled extent: {scaled_extent}")
+        print(f"Horizontal radius: {horizontal_radius}")
 
     xml_text = f"""<mujoco model="{model_name}">
   <asset>

@@ -3,7 +3,7 @@ from robosuite.models.objects import MujocoXMLObject
 
 from src.utils.dataset_xml_builder import build_dataset_object_xml
 
-
+# TODO: Verify correct parsing pipeline
 class DatasetMeshObject(MujocoXMLObject):
     """Wrap a dataset mesh as a robosuite-compatible MuJoCo XML object."""
 
@@ -32,6 +32,7 @@ class DatasetMeshObject(MujocoXMLObject):
         xml_path = generated_xml_dir / f"{mesh_path.stem}.xml"
 
         # TODO: Cache generated XML by mesh path and scale to avoid rebuilding on every reset.
+        # TODO: Verify broken cached objects are removed
         build_dataset_object_xml(
             mesh_path=mesh_path,
             xml_out_path=xml_path,
