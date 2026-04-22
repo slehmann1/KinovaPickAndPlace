@@ -1,0 +1,258 @@
+{
+  "num_requested": 10,
+  "num_evaluated": 10,
+  "num_attempted": 10,
+  "success_count": 1,
+  "success_rate": 0.1,
+  "lift_success_threshold_m": 0.01,
+  "dataset_root": "D:/graspfactory/robotiq",
+  "seed": null,
+  "start_idx": 0,
+  "render": false,
+  "visualize_count": 10,
+  "model_path": "",
+  "policy_prototypes": 1000,
+  "policy_demo_count": 262025,
+  "results": [
+    {
+      "object_idx": 28049,
+      "object_id": "00712691_9caf9fd560a494763f4ff16a_step_000_0004",
+      "demo_count": 262025,
+      "cluster_count": 1000,
+      "selected_prototype": 483,
+      "prototype_score": 0.24385819943875245,
+      "predicted_width": 34.19596862792969,
+      "initial_object_pos": [
+        -0.12,
+        0.0,
+        0.8260000000000001
+      ],
+      "final_object_pos": [
+        -0.8039303989330068,
+        -0.7249965535136433,
+        0.12959372525926618
+      ],
+      "lift_delta": -0.6964062747407339,
+      "lift_success": false,
+      "model_source": "loaded",
+      "model_path": "",
+      "status": "ok"
+    },
+    {
+      "object_idx": 27284,
+      "object_id": "00689657_4d4dae9b28bc4d3ce320a825_step_000_0000",
+      "demo_count": 262025,
+      "cluster_count": 1000,
+      "selected_prototype": 483,
+      "prototype_score": 0.24385819943875245,
+      "predicted_width": 34.19596862792969,
+      "initial_object_pos": [
+        -0.12,
+        0.0,
+        0.8260000000000001
+      ],
+      "final_object_pos": [
+        -0.1280692452046107,
+        -0.0646792841374572,
+        0.7978689989302039
+      ],
+      "lift_delta": -0.028131001069796158,
+      "lift_success": false,
+      "model_source": "loaded",
+      "model_path": "",
+      "status": "ok"
+    },
+    {
+      "object_idx": 4594,
+      "object_id": "00064617_3dc7e1104ad9441f933b4d52_step_007_0003",
+      "demo_count": 262025,
+      "cluster_count": 1000,
+      "selected_prototype": 483,
+      "prototype_score": 0.24385819943875245,
+      "predicted_width": 34.19596862792969,
+      "initial_object_pos": [
+        -0.12,
+        0.0,
+        0.8260000000000001
+      ],
+      "final_object_pos": [
+        -0.11703957449997705,
+        -0.00029470365284510426,
+        0.8957916731179487
+      ],
+      "lift_delta": 0.06979167311794865,
+      "lift_success": true,
+      "model_source": "loaded",
+      "model_path": "",
+      "status": "ok"
+    },
+    {
+      "object_idx": 19693,
+      "object_id": "00497931_a1682ac8852838408072def0_step_008_0000",
+      "demo_count": 262025,
+      "cluster_count": 1000,
+      "selected_prototype": 483,
+      "prototype_score": 0.24385819943875245,
+      "predicted_width": 34.19596862792969,
+      "initial_object_pos": [
+        -0.12,
+        0.0,
+        0.8260000000000001
+      ],
+      "final_object_pos": [
+        -0.11957927191568543,
+        0.0002919447683013595,
+        0.7965117379654832
+      ],
+      "lift_delta": -0.02948826203451682,
+      "lift_success": false,
+      "model_source": "loaded",
+      "model_path": "",
+      "status": "ok"
+    },
+    {
+      "object_idx": 26048,
+      "object_id": "00660018_58db84b0d8140a0fd1ad3af9_step_000_0133",
+      "demo_count": 262025,
+      "cluster_count": 1000,
+      "selected_prototype": 483,
+      "prototype_score": 0.24385819943875245,
+      "predicted_width": 34.19596862792969,
+      "initial_object_pos": [
+        -0.12,
+        0.0,
+        0.8260000000000001
+      ],
+      "final_object_pos": [
+        -0.13119890504431495,
+        -0.0008812558942009023,
+        0.7935450917949877
+      ],
+      "lift_delta": -0.0324549082050124,
+      "lift_success": false,
+      "model_source": "loaded",
+      "model_path": "",
+      "status": "ok"
+    },
+    {
+      "object_idx": 28335,
+      "object_id": "00719323_e456a92b2d1c531a8163228c_step_000_0000",
+      "demo_count": 262025,
+      "cluster_count": 1000,
+      "selected_prototype": 483,
+      "prototype_score": 0.24385819943875245,
+      "predicted_width": 34.19596862792969,
+      "initial_object_pos": [
+        -0.12,
+        0.0,
+        0.8260000000000001
+      ],
+      "final_object_pos": [
+        -0.1275493914736586,
+        -0.021616824874495674,
+        0.8015752214555499
+      ],
+      "lift_delta": -0.024424778544450132,
+      "lift_success": false,
+      "model_source": "loaded",
+      "model_path": "",
+      "status": "ok"
+    },
+    {
+      "object_idx": 14923,
+      "object_id": "00384811_89731ea2fb7ad77a08b24cb3_step_000_0000",
+      "demo_count": 262025,
+      "cluster_count": 1000,
+      "selected_prototype": 483,
+      "prototype_score": 0.24385819943875245,
+      "predicted_width": 34.19596862792969,
+      "initial_object_pos": [
+        -0.12,
+        0.0,
+        0.8260000000000001
+      ],
+      "final_object_pos": [
+        -0.12459587974898134,
+        0.0027717775969697427,
+        0.7971093958667728
+      ],
+      "lift_delta": -0.028890604133227304,
+      "lift_success": false,
+      "model_source": "loaded",
+      "model_path": "",
+      "status": "ok"
+    },
+    {
+      "object_idx": 6384,
+      "object_id": "00160884_57431862e4b00c24446f731d_step_000_0006",
+      "demo_count": 262025,
+      "cluster_count": 1000,
+      "selected_prototype": 483,
+      "prototype_score": 0.24385819943875245,
+      "predicted_width": 34.19596862792969,
+      "initial_object_pos": [
+        -0.12,
+        0.0,
+        0.8260000000000001
+      ],
+      "final_object_pos": [
+        -0.12238954687690103,
+        -0.051154115469232736,
+        0.814230662514719
+      ],
+      "lift_delta": -0.011769337485281084,
+      "lift_success": false,
+      "model_source": "loaded",
+      "model_path": "",
+      "status": "ok"
+    },
+    {
+      "object_idx": 19226,
+      "object_id": "00486531_fbe399fc5557310dd288defa_step_000_0002",
+      "demo_count": 262025,
+      "cluster_count": 1000,
+      "selected_prototype": 483,
+      "prototype_score": 0.24385819943875245,
+      "predicted_width": 34.19596862792969,
+      "initial_object_pos": [
+        -0.12,
+        0.0,
+        0.8260000000000001
+      ],
+      "final_object_pos": [
+        -0.12065022992475045,
+        5.8804064110113073e-05,
+        0.7971869894572183
+      ],
+      "lift_delta": -0.028813010542781736,
+      "lift_success": false,
+      "model_source": "loaded",
+      "model_path": "",
+      "status": "ok"
+    },
+    {
+      "object_idx": 17994,
+      "object_id": "00457668_3eff0fb793a009af5e865d7a_step_000_0023",
+      "demo_count": 262025,
+      "cluster_count": 1000,
+      "selected_prototype": 483,
+      "prototype_score": 0.24385819943875245,
+      "predicted_width": 34.19596862792969,
+      "initial_object_pos": [
+        -0.12,
+        0.0,
+        0.8260000000000001
+      ],
+      "final_object_pos": [
+        -0.1257038933836857,
+        0.00695439518262404,
+        0.8055049343604188
+      ],
+      "lift_delta": -0.020495065639581256,
+      "lift_success": false,
+      "model_source": "loaded",
+      "model_path": "",
+      "status": "ok"
+    }
+  ]
+}
