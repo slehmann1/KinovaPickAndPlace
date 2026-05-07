@@ -24,3 +24,12 @@ The below image demonstrates grasping for a range of objects.
 * **Obstacle navigation:** An RRT (Rapidly exploring Random Trees) based obstacle avoidance routine charts a collision-free path for the robotic arm to move from the grasp location to the target drop zone. This approach is shown to be successful for environments with a wide array of objects. 
 * **Control:** The robot control system is split into two distinct levels: low-level and high-level controllers. The high-level controller consists of the imitation learning model for grasping and the path planning algorithm that outlines how the end effector should travel to the goal. The low-level controller is responsible for implementing these commands and enabling the joints of the robot. This system functions through a PID controller implemented at the end effector; inverse kinematics are used to translate end effector positions to joint angles.
 
+---
+**Dependencies:**
+
+ 1. Mujoco
+ 2. GraspFactory
+ 3. Numpy
+ 4. Scipy
+ 5. Robosuite
+
