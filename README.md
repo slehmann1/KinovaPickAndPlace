@@ -1,63 +1,26 @@
-# Franka Pick and Place
 
+# **Kinova Pick And Place**
 
-## What is in this repository
+#### Overview
 
-- A custom `TargetEnvironment` with a table, target zone, and one manipulable object.
-- Simple PID-style arm control helpers for Cartesian motion and gripper commands.
-- Dataset utilities for loading GraspFactory grasp annotations and generating MJCF wrappers for OBJ meshes.
-- Imitation learning pipeline using the GraspFactory dataset and associated simulatiion functionality.
-- Obstacle avoidance routine executing a pick-and-place task.
-- Integration pipeline combining simulation of  imitation-based grasping with pick-and-place task in an obstacle-laden environment.
+This is a robotic simulation and motion planning pipeline designed for a pick-and-place task using a Kinova arm. It integrates imitation learning for object grasping with obstacle-aware motion planning to navigate and manipulate objects in obstacle laden environments.
 
-## Setup
+---
 
-This project currently targets a Windows PowerShell workflow.
+#### Example Showcase
+Full video of grasping an object and avoiding obstacles to place it in the target location.
+ [![Demonstration of a pick and place task in an obstacle laden environment](https://github.com/slehmann1/KinovaPickAndPlace/blob/main/demo/ImitationLearningAndObstacleAvoidance.gif?raw=true)](#) 
 
-1. Create the environment and install dependencies:
+---
 
-   ```powershell
-   .\build.ps1
-   ```
+#### Methodology
 
-2. Activate the virtual environment when you want an interactive shell:
+The project addresses the pick-and-place problem by breaking it into distinct components and bringing them together in an integrated pipeline:
 
-   ```powershell
-   .\.venv\Scripts\Activate.ps1
-   ```
+* **Grasping:** A Robitq 2F-85 gripper is used, paired with Imitation learning to be able to grasp a diverse variety of objects. Grasping policies are trained on a large dataset of grasps using the [GraspFactory](https://graspfactory.github.io/) dataset.
+The below image demonstrates grasping for a range of objects.
+ [![Grasping a range of objects](https://github.com/slehmann1/KinovaPickAndPlace/blob/main/demo/GraspDemonstration.png?raw=true)](#) 
 
-The build script installs local dependencies, clones the upstream GraspFactory repository into `data/graspfactory_repo`, and copies its sample dataset into `data/graspfactory`.
+* **Obstacle navigation:** An RRT (Rapidly exploring Random Trees) based obstacle avoidance routine charts a collision-free path for the robotic arm to move from the grasp location to the target drop zone. This approach is shown to be successful for environments with a wide array of objects. 
+* **Control:** The robot control system is split into two distinct levels: low-level and high-level controllers. The high-level controller consists of the imitation learning model for grasping and the path planning algorithm that outlines how the end effector should travel to the goal. The low-level controller is responsible for implementing these commands and enabling the joints of the robot. This system functions through a PID controller implemented at the end effector; inverse kinematics are used to translate end effector positions to joint angles.
 
-This provides a sample dataset, and includes a helper script to download the entire dataset used for training and evaluation.
-The full dataset is required for execution of the grasping and integrated routines. Note that the directory for this is hard coded and should be updated for your own system.
-
-## Running the scripts
-
-From the project root:
-
-```powershell
-.\.venv\Scripts\python.exe .\main.py
-.\.venv\Scripts\python.exe .\obstacle_navigation_rrt.py
-.\.venv\Scripts\python.exe .\pick_place_obstacle_rrt.py
-.\.venv\Scripts\python.exe .\evaluate_obstacle_navigation.py
-.\.venv\Scripts\python.exe .\imitation_grasp.py
-.\.venv\Scripts\python.exe .\evaluate_imitation_grasp.py --num-objects 10
-.\.venv\Scripts\python.exe .\imitation_grasp_obstacle_rrt.py
-.\.venv\Scripts\python.exe -m src.grasp.grasp_playground
-.\.venv\Scripts\python.exe -m src.utils.mesh_debug
-```
-
-## Notes
-
-- `main.py` is the simplest end-to-end scripted demo.
-- `obstacle_navigation_rrt.py` runs the obstacle-navigation RRT demo.
-- `pick_place_obstacle_rrt.py` runs the obstacle-aware pick-and-place pipeline.
-- `evaluate_obstacle_navigation.py` runs randomized obstacle-scene evaluation and writes a report.
-- `imitation_grasp.py` trains a grasping policy using imitation learning.
-- `evaluate_imitation_grasp.py` evaluates imitation grasping policies across multiple objects and logs success rates.
-- `imitation_grasp_obstacle_rrt.py` runs the integrated pipeline: it tests an imitation-based grasp on one object, and if that grasp succeeds, retries it in an obstacle scene and completes the pick-and-place task.
-- `python -m src.grasp.grasp_playground` is the current sandbox for loading one dataset grasp and inspecting it in the scene.
-- `python -m src.utils.mesh_debug` is useful when the loaded mesh appears offset or rotated incorrectly.
-
-## Demos
-Demonstrations of the various routines are available in the ```demos``` folder.
